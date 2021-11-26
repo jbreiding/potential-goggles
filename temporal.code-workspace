@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../projects/temporalite"
+		},
+		{
+			"path": "../projects/ui-server"
+		}
+	],
+	"settings": {}
+}

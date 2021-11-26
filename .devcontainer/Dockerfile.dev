@@ -1,0 +1,29 @@
+FROM mcr.microsoft.com/vscode/devcontainers/base:0-bullseye
+
+ARG INSTALL_ZSH="true"
+ARG UPGRADE_PACKAGES="false"
+ARG ENABLE_NONROOT_DOCKER="true"
+ARG USE_MOBY="true"
+ARG USERNAME=vscode
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+
+ENV DOCKER_BUILDKIT=1
+ENV GOPATH=/go
+ENV GO111MODULE=auto
+ENV PATH=/go/bin:/usr/local/go/bin:${PATH}
+
+COPY library-scripts/*.sh library-scripts/*.env /tmp/library-scripts/
+RUN /bin/bash /tmp/library-scripts/common-debian.sh "${INSTALL_ZSH}" "${USERNAME}" "${USER_UID}" "${USER_GID}" "${UPGRADE_PACKAGES}" "${INSTALL_ZSH}" "true" \
+    && /bin/bash /tmp/library-scripts/docker-debian.sh "${ENABLE_NONROOT_DOCKER}" "/var/run/docker-host.sock" "/var/run/docker.sock" "${USERNAME}"
+
+VOLUME ["/go"]
+RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
+
+RUN bash /tmp/library-scripts/go-debian.sh "latest" "/usr/local/go" "${GOPATH}" "${USERNAME}" "true"
+
+RUN apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* /tmp/library-scripts/
+
+ENTRYPOINT [ "/usr/local/share/docker-init.sh" ]
+CMD [ "sleep", "infinity" ]
+

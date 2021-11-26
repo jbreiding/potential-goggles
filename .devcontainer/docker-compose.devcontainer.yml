@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        UPGRADE_PACKAGES: "true"
+        INSTALL_ZSH: "false"
+    networks:
+      - my-app-network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker-host.sock
+      - my-app:/projects
+      - ..:/workspace:cached
+      - temporalite:/temporalite
+      - go:/go
+      - history:/history
+
+    container_name: devcontainer
+    command: sleep infinity
+    cap_add:
+     - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
+
+    user: vscode
+
+volumes:
+  my-app:
+    external: true
+  temporalite:
+    external: true
+  go:
+    external: true
+  history:
+    external: true
+
+networks:
+  my-app-network:
+    external: true

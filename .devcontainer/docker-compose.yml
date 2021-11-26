@@ -1,0 +1,36 @@
+version: '3.8'
+services:
+  ui-server:
+    environment:
+      - TEMPORAL_ADDRESS=temporalite:7233
+    depends_on:
+      - temporalite
+    build: /projects/ui-server
+    container_name: ui-server
+    networks:
+      - my-app-network
+    ports:
+      - 8080:8080
+    restart: always
+
+  temporalite:
+    build:
+      context: /projects/temporalite
+    entrypoint: ["/temporalite", "start", "-f", "/tmp/temporalite/temporalite.db", "-n", "default", "--ip" , "0.0.0.0"]
+    image: temporalite:test
+    volumes:
+      - temporalite:/tmp/temporalite
+    container_name: temporalite
+    networks:
+      - my-app-network
+    ports:
+      - 7233:7233
+    restart: always
+
+volumes:
+  temporalite:
+    external: true
+
+networks:
+  my-app-network:
+    external: true
